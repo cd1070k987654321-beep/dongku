@@ -527,7 +527,6 @@
     <div class="login-card">
       <div class="login-badge">🔒 관리자 전용</div>
       <h1>KCG Admin Login</h1>
-      <p>관리자 페이지는 로그인해야 들어올 수 있어. 지금은 임시 로그인 방식으로 잠깐 막아둔 상태야.</p>
 
       <form class="login-form" id="loginForm">
         <div class="field">
@@ -546,7 +545,6 @@
       </form>
 
       <div class="login-error" id="loginError"></div>
-      <div class="login-hint">초기 관리자 계정은 임시로 설정되어 있어. 운영 전에는 Firebase Authentication으로 바꾸는 걸 추천해.</div>
     </div>
   </div>
 
@@ -639,6 +637,7 @@
 
 <script type="module">
 import { db } from "./firebase-config.js";
+import { adminAuthConfig } from "./admin-auth-config.js";
 import {
   collection,
   deleteDoc,
@@ -648,8 +647,6 @@ import {
   query
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-const ADMIN_ID = "0000";
-const ADMIN_PASSWORD = "0000";
 const LOGIN_STORAGE_KEY = "kcgAdminLoggedIn";
 
 let cachedData = [];
@@ -907,7 +904,7 @@ document.getElementById("loginForm").addEventListener("submit", (event) => {
   const password = document.getElementById("adminPassword").value.trim();
   const errorBox = document.getElementById("loginError");
 
-  if (id === ADMIN_ID && password === ADMIN_PASSWORD) {
+  if (id === adminAuthConfig.username && password === adminAuthConfig.password) {
     sessionStorage.setItem(LOGIN_STORAGE_KEY, "true");
     errorBox.innerText = "";
     showAdminApp();
