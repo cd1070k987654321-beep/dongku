@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCG 역량 진단</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="header">
+  <h1>KCG 역량 진단</h1>
+  <p>감정 · 선택 · 관계 역량을 진단합니다</p>
+</div>
+
+<div class="card login" id="loginCard">
+  <h3>기본 정보 입력</h3>
+  <div class="form-grid">
+    <input id="email" placeholder="이메일 (필수)">
+    <input id="name" placeholder="이름">
+    <input id="dept" placeholder="부서">
+    <input id="position" placeholder="직급">
+  </div>
+  <button onclick="startSurvey()">진단 시작</button>
+</div>
+
+<div class="card progress-card">
+  <h3>응답 진행률</h3>
+  <p style="font-size:13px;color:#64748b;">
+    모든 문항에 응답하면 결과 리포트가 생성됩니다.
+  </p>
+  <div class="progress">
+    <div class="bar" id="bar"></div>
+  </div>
+  <p id="progressText">0 / 24 문항 완료</p>
+</div>
+
+<div id="survey" style="display:none;"></div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
