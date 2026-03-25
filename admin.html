@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCG Admin Dashboard</title>
+
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg: #f8fafc;
+    --panel: #ffffff;
+    --panel-soft: #f1f5f9;
+    --text: #0f172a;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --primary: #2563eb;
+    --primary-soft: #dbeafe;
+    --danger: #dc2626;
+    --danger-soft: #fee2e2;
+    --success: #16a34a;
+    --success-soft: #dcfce7;
+    --warn: #d97706;
+    --warn-soft: #fef3c7;
+    --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  }
+
+  body {
+    margin: 0;
+    min-width: 1280px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 28%),
+      linear-gradient(180deg, #f8fbff 0%, #f8fafc 100%);
+    color: var(--text);
+  }
+
+  button, input, select {
+    font-family: inherit;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 460px;
+    background: rgba(255,255,255,0.94);
+    border: 1px solid rgba(226,232,240,0.9);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    padding: 32px;
+    backdrop-filter: blur(10px);
+  }
+
+  .login-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+
+  .login-card h1 {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -0.04em;
+  }
+
+  .login-card p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  .login-form {
+    margin-top: 24px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .field label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  .field input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid var(--line);
+    background: white;
+    border-radius: 14px;
+    padding: 0 14px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .field input:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+  }
+
+  .login-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .login-hint,
+  .login-error {
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  .login-hint { color: var(--muted); }
+  .login-error { color: var(--danger); font-weight: 700; min-height: 18px; }
+
+  .shell {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 28px;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .title-wrap h1 {
+    margin: 0;
+    font-size: 34px;
+    letter-spacing: -0.04em;
+  }
+
+  .title-wrap p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  button {
+    border: none;
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .18s ease;
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+  }
+
+  .primary {
+    background: linear-gradient(135deg, #2563eb, #0f6bff);
+    color: white;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.18);
+  }
+
+  .secondary {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+
+  .danger {
+    background: var(--danger);
+    color: white;
+  }
+
+  .ghost {
+    background: white;
+    color: #334155;
+    border: 1px solid var(--line);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(860px, 1fr) 360px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .panel {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(226,232,240,0.9);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+  }
+
+  .panel-header {
+    padding: 22px 24px 0;
+  }
+
+  .panel-title {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .panel-subtitle {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    padding: 18px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+    border: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+
+  .stat-label {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .stat-foot {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .toolbar {
+    padding: 18px 24px 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .search-wrap {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .search-wrap input,
+  .search-wrap select {
+    height: 44px;
+    border: 1px solid var(--line);
+    background: white;
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+  }
+
+  .search-wrap input {
+    min-width: 360px;
+    flex: 1;
+  }
+
+  .search-wrap input:focus,
+  .search-wrap select:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+  }
+
+  .table-wrap {
+    padding: 0 24px 24px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  thead th {
+    background: #f8fafc;
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: left;
+    padding: 15px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  tbody td {
+    padding: 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+    font-size: 14px;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: #f8fbff;
+  }
+
+  .name-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .name-main {
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .name-sub {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .score-chip,
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 82px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .score-high { background: var(--success-soft); color: #166534; }
+  .score-mid { background: var(--warn-soft); color: #92400e; }
+  .score-low { background: var(--danger-soft); color: #991b1b; }
+
+  .status-chip {
+    background: var(--primary-soft);
+    color: #1d4ed8;
+  }
+
+  .row-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .row-actions button {
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .empty {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .detail-card {
+    padding: 22px;
+  }
+
+  .detail-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563eb, #60a5fa);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 20px;
+  }
+
+  .detail-name {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .detail-role {
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .detail-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .meta-item {
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fbfdff;
+  }
+
+  .meta-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .meta-value {
+    font-size: 14px;
+    font-weight: 700;
+    word-break: break-word;
+  }
+
+  .section-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .result-list {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .result-item {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+    background: white;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .result-name {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .result-score {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+
+  .bar-track {
+    margin-top: 10px;
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #60a5fa, #2563eb);
+  }
+</style>
+</head>
+<body>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-badge">🔒 관리자 전용</div>
+      <h1>KCG Admin Login</h1>
+      <p>관리자 페이지는 로그인해야 들어올 수 있어. 지금은 임시 로그인 방식으로 잠깐 막아둔 상태야.</p>
+
+      <form class="login-form" id="loginForm">
+        <div class="field">
+          <label for="adminId">아이디</label>
+          <input id="adminId" type="text" autocomplete="username" placeholder="관리자 아이디 입력">
+        </div>
+
+        <div class="field">
+          <label for="adminPassword">비밀번호</label>
+          <input id="adminPassword" type="password" autocomplete="current-password" placeholder="비밀번호 입력">
+        </div>
+
+        <div class="login-actions">
+          <button type="submit" class="primary" style="flex:1;">로그인</button>
+        </div>
+      </form>
+
+      <div class="login-error" id="loginError"></div>
+      <div class="login-hint">초기 관리자 계정은 임시로 설정되어 있어. 운영 전에는 Firebase Authentication으로 바꾸는 걸 추천해.</div>
+    </div>
+  </div>
+
+  <div id="adminApp" class="hidden">
+    <div class="shell">
+      <div class="topbar">
+        <div class="title-wrap">
+          <h1>KCG 관리자 대시보드</h1>
+          <p>데스크탑 환경 기준으로 설계된 응답 관리 화면이야. 제출 현황, 평균 점수, 상세 결과를 한 번에 관리할 수 있어.</p>
+        </div>
+        <div class="top-actions">
+          <button class="secondary" id="refreshButton">데이터 새로고침</button>
+          <button class="ghost" id="logoutButton">로그아웃</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">총 응답 수</div>
+          <div class="stat-value" id="totalCount">-</div>
+          <div class="stat-foot">현재 저장된 전체 응답</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">전체 평균 점수</div>
+          <div class="stat-value" id="averageScore">-</div>
+          <div class="stat-foot">모든 응답 평균 기준</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">최고 점수</div>
+          <div class="stat-value" id="highestScore">-</div>
+          <div class="stat-foot">평균 점수 기준 최고 응답</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">최근 제출</div>
+          <div class="stat-value" id="latestDate" style="font-size:18px; letter-spacing: -0.02em;">-</div>
+          <div class="stat-foot">가장 최근 저장 시각</div>
+        </div>
+      </div>
+
+      <div class="layout">
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">응답 목록</h2>
+            <p class="panel-subtitle">이름, 이메일, 조직 정보, 평균 점수를 기준으로 빠르게 조회하고 상세 결과를 확인할 수 있어.</p>
+          </div>
+
+          <div class="toolbar">
+            <div class="search-wrap">
+              <input id="searchInput" type="text" placeholder="이름, 이메일, 부서, 직급으로 검색">
+              <select id="scoreFilter">
+                <option value="all">전체 점수대</option>
+                <option value="high">고득점 (4.0 이상)</option>
+                <option value="mid">중간 (3.0 이상)</option>
+                <option value="low">낮음 (3.0 미만)</option>
+              </select>
+            </div>
+            <div class="panel-subtitle" id="resultCountText">0건 표시</div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 26%;">응답자</th>
+                  <th style="width: 18%;">부서 / 직급</th>
+                  <th style="width: 16%;">제출일</th>
+                  <th style="width: 12%;">평균 점수</th>
+                  <th style="width: 10%;">상태</th>
+                  <th style="width: 18%;">관리</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <tr>
+                  <td colspan="6" class="empty">데이터를 불러오는 중...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="panel detail-card" id="detailCard">
+            <div class="panel-title" style="margin-bottom: 8px;">상세 패널</div>
+            <p class="panel-subtitle">왼쪽 목록에서 응답 하나를 선택하면 여기서 상세 결과를 볼 수 있어.</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+import { db } from "./firebase-config.js";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const ADMIN_ID = "0000";
+const ADMIN_PASSWORD = "0000";
+const LOGIN_STORAGE_KEY = "kcgAdminLoggedIn";
+
+let cachedData = [];
+let filteredData = [];
+let selectedId = null;
+
+function getScoreClass(score) {
+  if (score >= 4) return "score-high";
+  if (score >= 3) return "score-mid";
+  return "score-low";
+}
+
+function getStatusLabel(score) {
+  if (score >= 4) return "우수";
+  if (score >= 3) return "보통";
+  return "주의";
+}
+
+function formatDate(value) {
+  if (!value) return "-";
+  if (value.seconds) {
+    return new Date(value.seconds * 1000).toLocaleString("ko-KR");
+  }
+  return String(value);
+}
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function showAdminApp() {
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("adminApp").classList.remove("hidden");
+}
+
+function showLoginScreen() {
+  document.getElementById("adminApp").classList.add("hidden");
+  document.getElementById("loginScreen").classList.remove("hidden");
+}
+
+function checkLogin() {
+  const isLoggedIn = sessionStorage.getItem(LOGIN_STORAGE_KEY) === "true";
+  if (isLoggedIn) {
+    showAdminApp();
+    loadData();
+  } else {
+    showLoginScreen();
+  }
+}
+
+function renderStats(data) {
+  document.getElementById("totalCount").innerText = data.length;
+
+  if (!data.length) {
+    document.getElementById("averageScore").innerText = "-";
+    document.getElementById("highestScore").innerText = "-";
+    document.getElementById("latestDate").innerText = "-";
+    return;
+  }
+
+  const avg = data.reduce((sum, item) => sum + (item.averageScore || 0), 0) / data.length;
+  const highest = Math.max(...data.map(item => item.averageScore || 0));
+  const latest = data[0]?.createdAt;
+
+  document.getElementById("averageScore").innerText = avg.toFixed(2);
+  document.getElementById("highestScore").innerText = highest.toFixed(2);
+  document.getElementById("latestDate").innerText = formatDate(latest);
+}
+
+function renderDetail(item) {
+  const panel = document.getElementById("detailCard");
+
+  if (!item) {
+    panel.innerHTML = `
+      <div class="panel-title" style="margin-bottom: 8px;">상세 패널</div>
+      <p class="panel-subtitle">왼쪽 목록에서 응답 하나를 선택하면 여기서 상세 결과를 볼 수 있어.</p>
+    `;
+    return;
+  }
+
+  const resultsHtml = (item.results || []).map(result => {
+    const score = Number(result.score || 0);
+    const width = Math.max(0, Math.min(100, (score / 5) * 100));
+
+    return `
+      <div class="result-item">
+        <div class="result-row">
+          <div class="result-name">${escapeHtml(result.category)}</div>
+          <div class="result-score">${score.toFixed(2)}점</div>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${width}%"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  panel.innerHTML = `
+    <div class="detail-top">
+      <div class="avatar">${escapeHtml((item.name || "U").charAt(0))}</div>
+      <div>
+        <div class="detail-name">${escapeHtml(item.name || "이름 없음")}</div>
+        <div class="detail-role">${escapeHtml(item.dept || "부서 없음")} / ${escapeHtml(item.position || "직급 없음")}</div>
+      </div>
+    </div>
+
+    <div class="detail-meta">
+      <div class="meta-item">
+        <div class="meta-label">이메일</div>
+        <div class="meta-value">${escapeHtml(item.email || "-")}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">제출일</div>
+        <div class="meta-value">${escapeHtml(formatDate(item.createdAt))}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">전체 평균 점수</div>
+        <div class="meta-value">${Number(item.averageScore || 0).toFixed(2)}점</div>
+      </div>
+    </div>
+
+    <div class="section-label">카테고리별 결과</div>
+    <div class="result-list">${resultsHtml || '<div class="panel-subtitle">결과 데이터 없음</div>'}</div>
+  `;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById("tableBody");
+  document.getElementById("resultCountText").innerText = `${data.length}건 표시`;
+
+  if (!data.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty">조건에 맞는 응답 데이터가 없어.</td>
+      </tr>
+    `;
+    renderDetail(null);
+    return;
+  }
+
+  tbody.innerHTML = data.map(item => {
+    const avg = Number(item.averageScore || 0);
+    const scoreClass = getScoreClass(avg);
+    const statusLabel = getStatusLabel(avg);
+    const isSelected = selectedId === item.id;
+
+    return `
+      <tr style="background:${isSelected ? '#f8fbff' : 'transparent'};">
+        <td>
+          <div class="name-cell">
+            <div class="name-main">${escapeHtml(item.name || "이름 없음")}</div>
+            <div class="name-sub">${escapeHtml(item.email || "이메일 없음")}</div>
+          </div>
+        </td>
+        <td>${escapeHtml(item.dept || "부서 없음")} / ${escapeHtml(item.position || "직급 없음")}</td>
+        <td>${escapeHtml(formatDate(item.createdAt))}</td>
+        <td><span class="score-chip ${scoreClass}">${avg.toFixed(2)}점</span></td>
+        <td><span class="status-chip">${statusLabel}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="primary" data-action="view" data-id="${item.id}">상세보기</button>
+            <button class="danger" data-action="delete" data-id="${item.id}">삭제</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  const selectedItem = data.find(item => item.id === selectedId) || data[0];
+  selectedId = selectedItem?.id || null;
+  renderDetail(selectedItem);
+}
+
+function applyFilters() {
+  const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+  const scoreFilter = document.getElementById("scoreFilter").value;
+
+  filteredData = cachedData.filter(item => {
+    const searchTarget = [item.name, item.email, item.dept, item.position]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    const score = Number(item.averageScore || 0);
+    const matchKeyword = !keyword || searchTarget.includes(keyword);
+
+    let matchScore = true;
+    if (scoreFilter === "high") matchScore = score >= 4;
+    if (scoreFilter === "mid") matchScore = score >= 3 && score < 4;
+    if (scoreFilter === "low") matchScore = score < 3;
+
+    return matchKeyword && matchScore;
+  });
+
+  renderTable(filteredData);
+}
+
+async function deleteItem(id) {
+  const ok = confirm("이 응답 데이터를 삭제할까?");
+  if (!ok) return;
+
+  try {
+    await deleteDoc(doc(db, "surveyResponses", id));
+    if (selectedId === id) selectedId = null;
+    await loadData();
+  } catch (error) {
+    console.error("삭제 실패:", error);
+    alert("삭제 중 오류가 발생했어. Firestore 권한을 확인해줘.");
+  }
+}
+
+async function loadData() {
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="6" class="empty">데이터를 불러오는 중...</td>
+    </tr>
+  `;
+
+  try {
+    const q = query(collection(db, "surveyResponses"), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+
+    cachedData = snapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+
+    renderStats(cachedData);
+    applyFilters();
+  } catch (error) {
+    console.error("조회 실패:", error);
+    document.getElementById("totalCount").innerText = "-";
+    document.getElementById("averageScore").innerText = "-";
+    document.getElementById("highestScore").innerText = "-";
+    document.getElementById("latestDate").innerText = "-";
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty">데이터를 불러오지 못했어. Firestore 설정이나 권한을 확인해줘.</td>
+      </tr>
+    `;
+    renderDetail(null);
+  }
+}
+
+document.getElementById("loginForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const id = document.getElementById("adminId").value.trim();
+  const password = document.getElementById("adminPassword").value.trim();
+  const errorBox = document.getElementById("loginError");
+
+  if (id === ADMIN_ID && password === ADMIN_PASSWORD) {
+    sessionStorage.setItem(LOGIN_STORAGE_KEY, "true");
+    errorBox.innerText = "";
+    showAdminApp();
+    loadData();
+    return;
+  }
+
+  errorBox.innerText = "아이디 또는 비밀번호가 올바르지 않아.";
+});
+
+document.getElementById("logoutButton").addEventListener("click", () => {
+  sessionStorage.removeItem(LOGIN_STORAGE_KEY);
+  selectedId = null;
+  cachedData = [];
+  filteredData = [];
+  document.getElementById("adminPassword").value = "";
+  showLoginScreen();
+});
+
+document.getElementById("refreshButton").addEventListener("click", loadData);
+document.getElementById("searchInput").addEventListener("input", applyFilters);
+document.getElementById("scoreFilter").addEventListener("change", applyFilters);
+
+document.getElementById("tableBody").addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+
+  const { action, id } = button.dataset;
+
+  if (action === "view") {
+    selectedId = id;
+    renderTable(filteredData);
+    return;
+  }
+
+  if (action === "delete") {
+    await deleteItem(id);
+  }
+});
+
+checkLogin();
+</script>
+</body>
+</html>
