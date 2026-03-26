@@ -678,15 +678,15 @@ function openDetailWindow(item) {
   const scores = (item.results || []).map(result => Number(result.score || 0));
   const categoryBlocks = CATEGORY_NAMES.map((category, categoryIndex) => {
     const baseIndex = categoryIndex * 3;
-    const answer1 = Number(item.answers?.[baseIndex] ?? 0);
-    const answer2 = Number(item.answers?.[baseIndex + 1] ?? 0);
-    const answer3 = Number(item.answers?.[baseIndex + 2] ?? 0);
-
     return {
       category,
       canvasId: `categoryRadar${categoryIndex}`,
       labels: ["문항 1", "문항 2", "문항 3"],
-      data: [answer1, answer2, answer3],
+      data: [
+        Number(item.answers?.[baseIndex] ?? 0),
+        Number(item.answers?.[baseIndex + 1] ?? 0),
+        Number(item.answers?.[baseIndex + 2] ?? 0)
+      ],
       questions: [
         QUESTION_TEXTS[baseIndex],
         QUESTION_TEXTS[baseIndex + 1],
@@ -745,42 +745,242 @@ function openDetailWindow(item) {
         .card {
           background: white;
           border: 1px solid #e2e8f0;
-          border-radius: 20px;
-          padding: 22px;
-          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-          margin-bottom: 18px;
+          border-radius: 24px;
+          padding: 24px;
+          box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+          margin-bottom: 20px;
         }
-        .title {
-          margin: 0 0 6px;
-          font-size: 28px;
+        .hero-card {
+          position: relative;
+          background: #ffffff;
+          border: 1px solid #d9e2ec;
+          border-radius: 28px;
+          padding: 0;
+          overflow: hidden;
+        }
+        .hero-band {
+          height: 18px;
+          background: linear-gradient(90deg, #0f172a 0%, #1d4ed8 45%, #60a5fa 100%);
+        }
+        .report-head {
+          padding: 28px 30px 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 20px;
+        }
+        .report-kicker {
+          font-size: 12px;
           font-weight: 800;
-          letter-spacing: -0.04em;
+          letter-spacing: 0.16em;
+          color: #1d4ed8;
+          text-transform: uppercase;
         }
-        .sub {
-          color: #64748b;
+        .report-title {
+          margin: 10px 0 0;
+          font-size: 34px;
+          font-weight: 900;
+          letter-spacing: -0.05em;
+          color: #0f172a;
+        }
+        .report-subtitle {
+          margin-top: 8px;
           font-size: 14px;
-          margin-bottom: 18px;
+          line-height: 1.6;
+          color: #64748b;
         }
-        .profile {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 12px;
+        .report-score {
+          min-width: 170px;
+          padding-left: 18px;
+          border-left: 1px solid #e2e8f0;
+          text-align: right;
         }
-        .meta {
-          border: 1px solid #e2e8f0;
-          border-radius: 14px;
-          padding: 14px;
-          background: #fbfdff;
-        }
-        .meta-label {
+        .report-score-label {
           font-size: 12px;
           color: #64748b;
+          margin-bottom: 8px;
+        }
+        .report-score-value {
+          font-size: 42px;
+          line-height: 1;
+          font-weight: 900;
+          letter-spacing: -0.05em;
+          color: #111827;
+        }
+        .report-score-unit {
+          font-size: 16px;
+          font-weight: 700;
+          color: #475569;
+          margin-left: 4px;
+        }
+        .profile-layout {
+          padding: 26px 30px 30px;
+          display: grid;
+          grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
+          gap: 28px;
+          align-items: end;
+        }
+        .profile-label {
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.14em;
+          color: #94a3b8;
+          text-transform: uppercase;
+          margin-bottom: 12px;
+        }
+        .company {
+          font-size: 40px;
+          line-height: 1.08;
+          font-weight: 900;
+          letter-spacing: -0.06em;
+          color: #0f172a;
+        }
+        .name-line {
+          margin-top: 14px;
+          display: flex;
+          align-items: flex-end;
+          gap: 14px;
+          flex-wrap: wrap;
+        }
+        .name {
+          margin: 0;
+          font-size: 28px;
+          line-height: 1.1;
+          font-weight: 800;
+          letter-spacing: -0.04em;
+          color: #1e293b;
+        }
+        .role-line {
+          font-size: 18px;
+          line-height: 1.4;
+          font-weight: 700;
+          color: #475569;
+        }
+        .summary-strip {
+          margin-top: 18px;
+          padding-top: 16px;
+          border-top: 1px solid #e2e8f0;
+          display: flex;
+          gap: 20px;
+          flex-wrap: wrap;
+          color: #475569;
+          font-size: 14px;
+        }
+        .summary-strip strong {
+          color: #0f172a;
+          font-weight: 800;
+          margin-right: 8px;
+        }
+        .info-panel {
+          border: 1px solid #e2e8f0;
+          border-radius: 18px;
+          padding: 18px 18px 16px;
+          background: #f8fafc;
+        }
+        .info-row {
+          padding: 12px 0;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .info-row:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+        .info-row:first-child {
+          padding-top: 0;
+        }
+        .info-label {
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          color: #94a3b8;
+          text-transform: uppercase;
           margin-bottom: 6px;
         }
-        .meta-value {
+        .info-value {
           font-size: 15px;
+          line-height: 1.6;
           font-weight: 700;
+          color: #0f172a;
           word-break: break-word;
+        }
+        .pdf-page {
+          margin-bottom: 22px;
+        }
+        .pdf-page-break {
+          break-before: page;
+          page-break-before: always;
+        }
+        .pdf-action-bar {
+          margin-top: 22px;
+          display: flex;
+          justify-content: center;
+        }
+        .pdf-button {
+          border: none;
+          border-radius: 999px;
+          padding: 14px 24px;
+          background: linear-gradient(135deg, #0f172a, #1d4ed8);
+          color: #ffffff;
+          font-size: 14px;
+          font-weight: 800;
+          letter-spacing: -0.01em;
+          cursor: pointer;
+          box-shadow: 0 12px 24px rgba(29, 78, 216, 0.18);
+        }
+        .pdf-button:hover {
+          transform: translateY(-1px);
+        }
+        @page {
+          size: A4 portrait;
+          margin: 12mm;
+        }
+        @media print {
+          body {
+            background: #ffffff;
+            padding: 0;
+          }
+          .wrap {
+            max-width: none;
+          }
+          .card {
+            box-shadow: none;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 12px;
+          }
+          .hero-card {
+            border-color: #cbd5e1;
+          }
+          .chart-wrap {
+            height: 340px;
+          }
+          .mini-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+          }
+          .mini-card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            padding: 12px;
+          }
+          .mini-chart-wrap {
+            height: 180px;
+          }
+          .mini-question-list {
+            font-size: 10px;
+            line-height: 1.5;
+          }
+          .pdf-action-bar {
+            display: none !important;
+          }
+          .pdf-page {
+            min-height: auto;
+            margin-bottom: 0;
+          }
+          .pdf-page-break {
+            break-before: page;
+            page-break-before: always;
+          }
         }
         .section-title {
           margin: 0 0 14px;
@@ -846,32 +1046,107 @@ function openDetailWindow(item) {
     </head>
     <body>
       <div class="wrap">
-        <div class="card">
-          <div class="title">${escapeHtml(item.name || "이름 없음")}</div>
-          <div class="sub">응답 상세 결과</div>
-          <div class="profile">
-            <div class="meta"><div class="meta-label">이메일</div><div class="meta-value">${escapeHtml(item.email || "-")}</div></div>
-            <div class="meta"><div class="meta-label">회사명</div><div class="meta-value">${escapeHtml(item.company || "-")}</div></div>
-            <div class="meta"><div class="meta-label">직급</div><div class="meta-value">${escapeHtml(item.position || "-")}</div></div>
-            <div class="meta"><div class="meta-label">부서</div><div class="meta-value">${escapeHtml(item.dept || "-")}</div></div>
-            <div class="meta"><div class="meta-label">제출일</div><div class="meta-value">${escapeHtml(formatDate(item.createdAt))}</div></div>
-            <div class="meta"><div class="meta-label">전체 평균 점수</div><div class="meta-value">${Number(item.averageScore || 0).toFixed(2)}점</div></div>
+        <section class="pdf-page">
+          <div class="card hero-card">
+            <div class="hero-band"></div>
+            <div class="report-head">
+              <div>
+                <div class="report-kicker">KCG COMPETENCY REPORT</div>
+                <div class="report-title">응답 상세 결과 리포트</div>
+                <div class="report-subtitle">개인 응답 프로필과 카테고리별 진단 결과를 정리한 PDF 보고서용 화면입니다.</div>
+              </div>
+              <div class="report-score">
+                <div class="report-score-label">전체 평균 점수</div>
+                <div><span class="report-score-value">${Number(item.averageScore || 0).toFixed(2)}</span><span class="report-score-unit">점</span></div>
+              </div>
+            </div>
+            <div class="profile-layout">
+              <div>
+                <div class="profile-label">Company</div>
+                <div class="company">${escapeHtml(item.company || "회사명 없음")}</div>
+                <div class="name-line">
+                  <h1 class="name">${escapeHtml(item.name || "이름 없음")}</h1>
+                  <div class="role-line">${escapeHtml(item.position || "직급 없음")} · ${escapeHtml(item.dept || "부서 없음")}</div>
+                </div>
+                <div class="summary-strip">
+                  <div><strong>제출일</strong>${escapeHtml(formatDate(item.createdAt))}</div>
+                  <div><strong>이메일</strong>${escapeHtml(item.email || "-")}</div>
+                </div>
+              </div>
+              <div class="info-panel">
+                <div class="info-row">
+                  <div class="info-label">응답자명</div>
+                  <div class="info-value">${escapeHtml(item.name || "-")}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">소속 정보</div>
+                  <div class="info-value">${escapeHtml(item.company || "-")} / ${escapeHtml(item.dept || "-")}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">직급</div>
+                  <div class="info-value">${escapeHtml(item.position || "-")}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">연락처 정보</div>
+                  <div class="info-value">${escapeHtml(item.email || "-")}</div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="card">
-          <div class="section-title">카테고리별 결과 그래프</div>
-          <div class="chart-wrap">
-            <canvas id="resultRadarChart"></canvas>
+          <div class="card">
+            <div class="section-title">카테고리별 결과 그래프</div>
+            <div class="chart-wrap">
+              <canvas id="resultRadarChart"></canvas>
+            </div>
+            <div class="result-list">${summaryCards || '<div>결과 데이터 없음</div>'}</div>
           </div>
-          <div class="result-list">${summaryCards || '<div>결과 데이터 없음</div>'}</div>
-        </div>
+        </section>
 
-        <div class="card">
-          <div class="section-title">카테고리별 3문항 레이더 차트</div>
-          <div class="mini-grid">
-            ${categoryChartsHtml}
+        <section class="pdf-page pdf-page-break">
+          <div class="card">
+            <div class="section-title">카테고리별 3문항 레이더 차트 (1/2)</div>
+            <div class="mini-grid">
+              ${categoryBlocks.slice(0, 6).map(block => `
+                <div class="mini-card">
+                  <div class="mini-title">${escapeHtml(block.category)}</div>
+                  <div class="mini-chart-wrap">
+                    <canvas id="${block.canvasId}"></canvas>
+                  </div>
+                  <div class="mini-question-list">
+                    <div>1. ${escapeHtml(block.questions[0] || "")}</div>
+                    <div>2. ${escapeHtml(block.questions[1] || "")}</div>
+                    <div>3. ${escapeHtml(block.questions[2] || "")}</div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
           </div>
+        </section>
+
+        <section class="pdf-page pdf-page-break">
+          <div class="card">
+            <div class="section-title">카테고리별 3문항 레이더 차트 (2/2)</div>
+            <div class="mini-grid">
+              ${categoryBlocks.slice(6).map(block => `
+                <div class="mini-card">
+                  <div class="mini-title">${escapeHtml(block.category)}</div>
+                  <div class="mini-chart-wrap">
+                    <canvas id="${block.canvasId}"></canvas>
+                  </div>
+                  <div class="mini-question-list">
+                    <div>1. ${escapeHtml(block.questions[0] || "")}</div>
+                    <div>2. ${escapeHtml(block.questions[1] || "")}</div>
+                    <div>3. ${escapeHtml(block.questions[2] || "")}</div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </section>
+
+        <div class="pdf-action-bar">
+          <button class="pdf-button" id="printPdfButton">PDF로 저장하기</button>
         </div>
       </div>
 
@@ -934,7 +1209,11 @@ function openDetailWindow(item) {
           'rgba(225, 29, 72, 1)'
         );
 
-        ${categoryBlocks.map((block, idx) => `createRadar('${block.canvasId}', ${JSON.stringify(block.labels)}, ${JSON.stringify(block.data)}, '${block.category}', 'rgba(${40 + idx * 20}, ${99 + (idx * 11 % 100)}, ${235 - (idx * 10 % 120)}, 1)');`).join('\n')}
+        ${categoryBlocks.map((block, idx) => `createRadar('${block.canvasId}', ${JSON.stringify(block.labels)}, ${JSON.stringify(block.data)}, '${block.category}', 'rgba(${40 + idx * 18}, ${99 + (idx * 9 % 100)}, ${235 - (idx * 11 % 120)}, 1)');`).join('\n')}
+
+        document.getElementById('printPdfButton')?.addEventListener('click', () => {
+          window.print();
+        });
       <\/script>
     </body>
     </html>
