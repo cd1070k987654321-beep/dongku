@@ -11,7 +11,6 @@
   :root {
     --bg: #f8fafc;
     --panel: #ffffff;
-    --panel-soft: #f1f5f9;
     --text: #0f172a;
     --muted: #64748b;
     --line: #e2e8f0;
@@ -82,13 +81,6 @@
     letter-spacing: -0.04em;
   }
 
-  .login-card p {
-    margin: 10px 0 0;
-    color: var(--muted);
-    line-height: 1.6;
-    font-size: 14px;
-  }
-
   .login-form {
     margin-top: 24px;
     display: grid;
@@ -125,17 +117,16 @@
     margin-top: 8px;
   }
 
-  .login-hint,
   .login-error {
     font-size: 13px;
     margin-top: 12px;
+    color: var(--danger);
+    font-weight: 700;
+    min-height: 18px;
   }
 
-  .login-hint { color: var(--muted); }
-  .login-error { color: var(--danger); font-weight: 700; min-height: 18px; }
-
   .shell {
-    max-width: 1440px;
+    max-width: 1540px;
     margin: 0 auto;
     padding: 28px;
   }
@@ -201,13 +192,6 @@
     border: 1px solid var(--line);
   }
 
-  .layout {
-    display: grid;
-    grid-template-columns: minmax(860px, 1fr) 360px;
-    gap: 24px;
-    align-items: start;
-  }
-
   .panel {
     background: rgba(255,255,255,0.9);
     border: 1px solid rgba(226,232,240,0.9);
@@ -268,21 +252,22 @@
 
   .toolbar {
     padding: 18px 24px 20px;
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    align-items: center;
+    display: grid;
+    gap: 12px;
   }
 
-  .search-wrap {
-    flex: 1;
+  .search-row,
+  .filter-row,
+  .action-row {
     display: flex;
     gap: 12px;
     align-items: center;
   }
 
-  .search-wrap input,
-  .search-wrap select {
+  .search-row input,
+  .search-row select,
+  .filter-row input,
+  .action-row select {
     height: 44px;
     border: 1px solid var(--line);
     background: white;
@@ -293,15 +278,23 @@
     outline: none;
   }
 
-  .search-wrap input {
-    min-width: 360px;
+  .search-row input,
+  .filter-row input {
     flex: 1;
   }
 
-  .search-wrap input:focus,
-  .search-wrap select:focus {
+  .search-row input:focus,
+  .search-row select:focus,
+  .filter-row input:focus,
+  .action-row select:focus {
     border-color: #93c5fd;
     box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+  }
+
+  .result-meta {
+    color: var(--muted);
+    font-size: 13px;
+    margin-left: auto;
   }
 
   .table-wrap {
@@ -360,8 +353,7 @@
     font-size: 12px;
   }
 
-  .score-chip,
-  .status-chip {
+  .score-chip {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -375,11 +367,6 @@
   .score-high { background: var(--success-soft); color: #166534; }
   .score-mid { background: var(--warn-soft); color: #92400e; }
   .score-low { background: var(--danger-soft); color: #991b1b; }
-
-  .status-chip {
-    background: var(--primary-soft);
-    color: #1d4ed8;
-  }
 
   .row-actions {
     display: flex;
@@ -396,129 +383,6 @@
     padding: 48px 24px;
     text-align: center;
     color: var(--muted);
-  }
-
-  .sidebar {
-    position: sticky;
-    top: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .detail-card {
-    padding: 22px;
-  }
-
-  .detail-top {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 18px;
-  }
-
-  .avatar {
-    width: 54px;
-    height: 54px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #2563eb, #60a5fa);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 20px;
-  }
-
-  .detail-name {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-  }
-
-  .detail-role {
-    margin-top: 4px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .detail-meta {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .meta-item {
-    padding: 12px 14px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: #fbfdff;
-  }
-
-  .meta-label {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .meta-value {
-    font-size: 14px;
-    font-weight: 700;
-    word-break: break-word;
-  }
-
-  .section-label {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 10px;
-    font-weight: 700;
-  }
-
-  .result-list {
-    display: grid;
-    gap: 10px;
-    margin-bottom: 6px;
-  }
-
-  .result-item {
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 12px 14px;
-    background: white;
-  }
-
-  .result-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .result-name {
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  .result-score {
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--primary);
-  }
-
-  .bar-track {
-    margin-top: 10px;
-    width: 100%;
-    height: 8px;
-    border-radius: 999px;
-    background: #e2e8f0;
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #60a5fa, #2563eb);
   }
 </style>
 </head>
@@ -553,7 +417,7 @@
       <div class="topbar">
         <div class="title-wrap">
           <h1>KCG 관리자 대시보드</h1>
-          <p>데스크탑 환경 기준으로 설계된 응답 관리 화면이야. 제출 현황, 평균 점수, 상세 결과를 한 번에 관리할 수 있어.</p>
+          <p>데스크탑 환경 기준으로 설계된 응답 관리 화면입니다. 제출 현황, 평균 점수, 상세 결과를 한 번에 관리하실 수 있습니다.</p>
         </div>
         <div class="top-actions">
           <button class="secondary" id="refreshButton">데이터 새로고침</button>
@@ -565,76 +429,83 @@
         <div class="stat-card">
           <div class="stat-label">총 응답 수</div>
           <div class="stat-value" id="totalCount">-</div>
-          <div class="stat-foot">현재 저장된 전체 응답</div>
+          <div class="stat-foot">현재 조회된 응답 기준</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">전체 평균 점수</div>
           <div class="stat-value" id="averageScore">-</div>
-          <div class="stat-foot">모든 응답 평균 기준</div>
+          <div class="stat-foot">현재 조회 결과 평균 기준</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">최고 점수</div>
           <div class="stat-value" id="highestScore">-</div>
-          <div class="stat-foot">평균 점수 기준 최고 응답</div>
+          <div class="stat-foot">현재 조회 결과 최고 응답</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">최근 제출</div>
           <div class="stat-value" id="latestDate" style="font-size:18px; letter-spacing: -0.02em;">-</div>
-          <div class="stat-foot">가장 최근 저장 시각</div>
+          <div class="stat-foot">현재 조회 결과 기준</div>
         </div>
       </div>
 
-      <div class="layout">
-        <section class="panel">
-          <div class="panel-header">
-            <h2 class="panel-title">응답 목록</h2>
-            <p class="panel-subtitle">이름, 이메일, 조직 정보, 평균 점수를 기준으로 빠르게 조회하고 상세 결과를 확인할 수 있어.</p>
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">응답 목록</h2>
+          <p class="panel-subtitle">자유검색과 회사명/직급/부서명 개별 필터를 조합해서 원하는 응답자만 조회하실 수 있습니다.</p>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-row">
+            <input id="searchInput" type="text" placeholder="이름 또는 이메일로 자유검색">
+            <select id="scoreFilter">
+              <option value="all">전체 점수대</option>
+              <option value="high">고득점 (4.0 이상)</option>
+              <option value="mid">중간 (3.0 이상)</option>
+              <option value="low">낮음 (3.0 미만)</option>
+            </select>
           </div>
 
-          <div class="toolbar">
-            <div class="search-wrap">
-              <input id="searchInput" type="text" placeholder="이름, 이메일, 부서, 직급으로 검색">
-              <select id="scoreFilter">
-                <option value="all">전체 점수대</option>
-                <option value="high">고득점 (4.0 이상)</option>
-                <option value="mid">중간 (3.0 이상)</option>
-                <option value="low">낮음 (3.0 미만)</option>
-              </select>
-            </div>
-            <div class="panel-subtitle" id="resultCountText">0건 표시</div>
+          <div class="filter-row">
+            <input id="companyFilter" type="text" placeholder="회사명 필터 (예: 네이버)">
+            <input id="positionFilter" type="text" placeholder="직급 필터 (예: 대리)">
+            <input id="deptFilter" type="text" placeholder="부서명 필터 (예: 개발본부)">
           </div>
 
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width: 26%;">응답자</th>
-                  <th style="width: 18%;">부서 / 직급</th>
-                  <th style="width: 16%;">제출일</th>
-                  <th style="width: 12%;">평균 점수</th>
-                  <th style="width: 10%;">상태</th>
-                  <th style="width: 18%;">관리</th>
-                </tr>
-              </thead>
-              <tbody id="tableBody">
-                <tr>
-                  <td colspan="6" class="empty">데이터를 불러오는 중...</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="action-row">
+            <select id="downloadScope">
+              <option value="filtered">현재 조회 결과 저장</option>
+              <option value="all">전체 데이터 저장</option>
+            </select>
+            <button class="secondary" id="downloadXlsxButton">엑셀 저장</button>
+            <div class="result-meta" id="resultCountText">0건 표시</div>
           </div>
-        </section>
+        </div>
 
-        <aside class="sidebar">
-          <section class="panel detail-card" id="detailCard">
-            <div class="panel-title" style="margin-bottom: 8px;">상세 패널</div>
-            <p class="panel-subtitle">왼쪽 목록에서 응답 하나를 선택하면 여기서 상세 결과를 볼 수 있어.</p>
-          </section>
-        </aside>
-      </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">이름 / 이메일</th>
+                <th style="width: 18%;">회사명</th>
+                <th style="width: 14%;">직급</th>
+                <th style="width: 14%;">부서</th>
+                <th style="width: 14%;">제출일</th>
+                <th style="width: 10%;">평균 점수</th>
+                <th style="width: 12%;">관리</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr>
+                <td colspan="7" class="empty">데이터를 불러오는 중...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   </div>
 
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script type="module">
 import { db } from "./firebase-config.js";
 import { adminAuthConfig } from "./admin-auth-config.js";
@@ -648,21 +519,24 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const LOGIN_STORAGE_KEY = "kcgAdminLoggedIn";
+const CATEGORY_KEYS = [
+  "감정식별력",
+  "패턴인식",
+  "결과예측",
+  "감정조절·활용",
+  "내적동기",
+  "낙관성",
+  "공감",
+  "목적지향"
+];
 
 let cachedData = [];
 let filteredData = [];
-let selectedId = null;
 
 function getScoreClass(score) {
   if (score >= 4) return "score-high";
   if (score >= 3) return "score-mid";
   return "score-low";
-}
-
-function getStatusLabel(score) {
-  if (score >= 4) return "우수";
-  if (score >= 3) return "보통";
-  return "주의";
 }
 
 function formatDate(value) {
@@ -721,14 +595,56 @@ function renderStats(data) {
   document.getElementById("latestDate").innerText = formatDate(latest);
 }
 
-function renderDetail(item) {
-  const panel = document.getElementById("detailCard");
+function buildExportRows(data) {
+  return data.map(item => {
+    const resultMap = Object.fromEntries((item.results || []).map(result => [result.category, result.score]));
 
-  if (!item) {
-    panel.innerHTML = `
-      <div class="panel-title" style="margin-bottom: 8px;">상세 패널</div>
-      <p class="panel-subtitle">왼쪽 목록에서 응답 하나를 선택하면 여기서 상세 결과를 볼 수 있어.</p>
-    `;
+    return {
+      이름: item.name || "",
+      이메일: item.email || "",
+      회사명: item.company || "",
+      직급: item.position || "",
+      부서: item.dept || "",
+      평균점수: Number(item.averageScore || 0).toFixed(2),
+      제출일: formatDate(item.createdAt),
+      감정식별력: resultMap["감정식별력"] ?? "",
+      패턴인식: resultMap["패턴인식"] ?? "",
+      결과예측: resultMap["결과예측"] ?? "",
+      "감정조절·활용": resultMap["감정조절·활용"] ?? "",
+      내적동기: resultMap["내적동기"] ?? "",
+      낙관성: resultMap["낙관성"] ?? "",
+      공감: resultMap["공감"] ?? "",
+      목적지향: resultMap["목적지향"] ?? ""
+    };
+  });
+}
+
+function downloadXlsx() {
+  const scope = document.getElementById("downloadScope").value;
+  const exportData = scope === "all" ? cachedData : filteredData;
+
+  if (!exportData.length) {
+    alert("저장할 데이터가 없습니다.");
+    return;
+  }
+
+  const rows = buildExportRows(exportData);
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "응답목록");
+
+  const now = new Date();
+  const scopeLabel = scope === "all" ? "전체" : "조회결과";
+  const fileName = `kcg-${scopeLabel}-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.xlsx`;
+
+  XLSX.writeFile(workbook, fileName);
+}
+
+function openDetailWindow(item) {
+  const popup = window.open("", "kcg-response-detail", "width=860,height=900,resizable=yes,scrollbars=yes");
+
+  if (!popup) {
+    alert("팝업이 차단되었습니다. 브라우저에서 팝업을 허용해주세요.");
     return;
   }
 
@@ -749,33 +665,137 @@ function renderDetail(item) {
     `;
   }).join("");
 
-  panel.innerHTML = `
-    <div class="detail-top">
-      <div class="avatar">${escapeHtml((item.name || "U").charAt(0))}</div>
-      <div>
-        <div class="detail-name">${escapeHtml(item.name || "이름 없음")}</div>
-        <div class="detail-role">${escapeHtml(item.dept || "부서 없음")} / ${escapeHtml(item.position || "직급 없음")}</div>
-      </div>
-    </div>
+  popup.document.write(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>응답 상세보기</title>
+      <style>
+        * { box-sizing: border-box; }
+        body {
+          margin: 0;
+          padding: 28px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          background: #f8fafc;
+          color: #0f172a;
+        }
+        .wrap {
+          max-width: 900px;
+          margin: 0 auto;
+        }
+        .card {
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 20px;
+          padding: 22px;
+          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+          margin-bottom: 18px;
+        }
+        .title {
+          margin: 0 0 6px;
+          font-size: 28px;
+          font-weight: 800;
+          letter-spacing: -0.04em;
+        }
+        .sub {
+          color: #64748b;
+          font-size: 14px;
+          margin-bottom: 18px;
+        }
+        .profile {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+        .meta {
+          border: 1px solid #e2e8f0;
+          border-radius: 14px;
+          padding: 14px;
+          background: #fbfdff;
+        }
+        .meta-label {
+          font-size: 12px;
+          color: #64748b;
+          margin-bottom: 6px;
+        }
+        .meta-value {
+          font-size: 15px;
+          font-weight: 700;
+          word-break: break-word;
+        }
+        .section-title {
+          margin: 0 0 14px;
+          font-size: 18px;
+          font-weight: 800;
+        }
+        .result-list {
+          display: grid;
+          gap: 12px;
+        }
+        .result-item {
+          border: 1px solid #e2e8f0;
+          border-radius: 14px;
+          padding: 14px;
+          background: white;
+        }
+        .result-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+        }
+        .result-name {
+          font-size: 14px;
+          font-weight: 700;
+        }
+        .result-score {
+          font-size: 14px;
+          font-weight: 800;
+          color: #2563eb;
+        }
+        .bar-track {
+          margin-top: 10px;
+          width: 100%;
+          height: 8px;
+          border-radius: 999px;
+          background: #e2e8f0;
+          overflow: hidden;
+        }
+        .bar-fill {
+          height: 100%;
+          border-radius: 999px;
+          background: linear-gradient(90deg, #60a5fa, #2563eb);
+        }
+      </style>
+    </head>
+    <body>
+      <div class="wrap">
+        <div class="card">
+          <div class="title">${escapeHtml(item.name || "이름 없음")}</div>
+          <div class="sub">응답 상세 결과</div>
+          <div class="profile">
+            <div class="meta"><div class="meta-label">이메일</div><div class="meta-value">${escapeHtml(item.email || "-")}</div></div>
+            <div class="meta"><div class="meta-label">회사명</div><div class="meta-value">${escapeHtml(item.company || "-")}</div></div>
+            <div class="meta"><div class="meta-label">직급</div><div class="meta-value">${escapeHtml(item.position || "-")}</div></div>
+            <div class="meta"><div class="meta-label">부서</div><div class="meta-value">${escapeHtml(item.dept || "-")}</div></div>
+            <div class="meta"><div class="meta-label">제출일</div><div class="meta-value">${escapeHtml(formatDate(item.createdAt))}</div></div>
+            <div class="meta"><div class="meta-label">전체 평균 점수</div><div class="meta-value">${Number(item.averageScore || 0).toFixed(2)}점</div></div>
+          </div>
+        </div>
 
-    <div class="detail-meta">
-      <div class="meta-item">
-        <div class="meta-label">이메일</div>
-        <div class="meta-value">${escapeHtml(item.email || "-")}</div>
+        <div class="card">
+          <div class="section-title">카테고리별 결과</div>
+          <div class="result-list">${resultsHtml || '<div>결과 데이터 없음</div>'}</div>
+        </div>
       </div>
-      <div class="meta-item">
-        <div class="meta-label">제출일</div>
-        <div class="meta-value">${escapeHtml(formatDate(item.createdAt))}</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">전체 평균 점수</div>
-        <div class="meta-value">${Number(item.averageScore || 0).toFixed(2)}점</div>
-      </div>
-    </div>
+    </body>
+    </html>
+  `);
 
-    <div class="section-label">카테고리별 결과</div>
-    <div class="result-list">${resultsHtml || '<div class="panel-subtitle">결과 데이터 없음</div>'}</div>
-  `;
+  popup.document.close();
+  popup.focus();
 }
 
 function renderTable(data) {
@@ -785,31 +805,29 @@ function renderTable(data) {
   if (!data.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="empty">조건에 맞는 응답 데이터가 없어.</td>
+        <td colspan="7" class="empty">조건에 맞는 응답 데이터가 없습니다.</td>
       </tr>
     `;
-    renderDetail(null);
     return;
   }
 
   tbody.innerHTML = data.map(item => {
     const avg = Number(item.averageScore || 0);
     const scoreClass = getScoreClass(avg);
-    const statusLabel = getStatusLabel(avg);
-    const isSelected = selectedId === item.id;
 
     return `
-      <tr style="background:${isSelected ? '#f8fbff' : 'transparent'};">
+      <tr>
         <td>
           <div class="name-cell">
             <div class="name-main">${escapeHtml(item.name || "이름 없음")}</div>
             <div class="name-sub">${escapeHtml(item.email || "이메일 없음")}</div>
           </div>
         </td>
-        <td>${escapeHtml(item.dept || "부서 없음")} / ${escapeHtml(item.position || "직급 없음")}</td>
+        <td>${escapeHtml(item.company || "회사명 없음")}</td>
+        <td>${escapeHtml(item.position || "직급 없음")}</td>
+        <td>${escapeHtml(item.dept || "부서 없음")}</td>
         <td>${escapeHtml(formatDate(item.createdAt))}</td>
         <td><span class="score-chip ${scoreClass}">${avg.toFixed(2)}점</span></td>
-        <td><span class="status-chip">${statusLabel}</span></td>
         <td>
           <div class="row-actions">
             <button class="primary" data-action="view" data-id="${item.id}">상세보기</button>
@@ -819,47 +837,53 @@ function renderTable(data) {
       </tr>
     `;
   }).join("");
-
-  const selectedItem = data.find(item => item.id === selectedId) || data[0];
-  selectedId = selectedItem?.id || null;
-  renderDetail(selectedItem);
 }
 
 function applyFilters() {
   const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+  const companyFilter = document.getElementById("companyFilter").value.trim().toLowerCase();
+  const positionFilter = document.getElementById("positionFilter").value.trim().toLowerCase();
+  const deptFilter = document.getElementById("deptFilter").value.trim().toLowerCase();
   const scoreFilter = document.getElementById("scoreFilter").value;
 
   filteredData = cachedData.filter(item => {
-    const searchTarget = [item.name, item.email, item.dept, item.position]
+    const searchTarget = [item.name, item.email]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
 
+    const company = String(item.company || "").toLowerCase();
+    const position = String(item.position || "").toLowerCase();
+    const dept = String(item.dept || "").toLowerCase();
     const score = Number(item.averageScore || 0);
+
     const matchKeyword = !keyword || searchTarget.includes(keyword);
+    const matchCompany = !companyFilter || company.includes(companyFilter);
+    const matchPosition = !positionFilter || position.includes(positionFilter);
+    const matchDept = !deptFilter || dept.includes(deptFilter);
 
     let matchScore = true;
     if (scoreFilter === "high") matchScore = score >= 4;
     if (scoreFilter === "mid") matchScore = score >= 3 && score < 4;
     if (scoreFilter === "low") matchScore = score < 3;
 
-    return matchKeyword && matchScore;
+    return matchKeyword && matchCompany && matchPosition && matchDept && matchScore;
   });
 
+  renderStats(filteredData);
   renderTable(filteredData);
 }
 
 async function deleteItem(id) {
-  const ok = confirm("이 응답 데이터를 삭제할까?");
+  const ok = confirm("이 응답 데이터를 삭제하시겠습니까?");
   if (!ok) return;
 
   try {
     await deleteDoc(doc(db, "surveyResponses", id));
-    if (selectedId === id) selectedId = null;
     await loadData();
   } catch (error) {
     console.error("삭제 실패:", error);
-    alert("삭제 중 오류가 발생했어. Firestore 권한을 확인해줘.");
+    alert("삭제 중 오류가 발생했습니다. Firestore 권한을 확인해주세요.");
   }
 }
 
@@ -867,7 +891,7 @@ async function loadData() {
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = `
     <tr>
-      <td colspan="6" class="empty">데이터를 불러오는 중...</td>
+      <td colspan="7" class="empty">데이터를 불러오는 중...</td>
     </tr>
   `;
 
@@ -880,7 +904,6 @@ async function loadData() {
       ...docSnap.data()
     }));
 
-    renderStats(cachedData);
     applyFilters();
   } catch (error) {
     console.error("조회 실패:", error);
@@ -890,10 +913,9 @@ async function loadData() {
     document.getElementById("latestDate").innerText = "-";
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="empty">데이터를 불러오지 못했어. Firestore 설정이나 권한을 확인해줘.</td>
+        <td colspan="7" class="empty">데이터를 불러오지 못했습니다. Firestore 설정이나 권한을 확인해주세요.</td>
       </tr>
     `;
-    renderDetail(null);
   }
 }
 
@@ -912,12 +934,11 @@ document.getElementById("loginForm").addEventListener("submit", (event) => {
     return;
   }
 
-  errorBox.innerText = "아이디 또는 비밀번호가 올바르지 않아.";
+  errorBox.innerText = "아이디 또는 비밀번호가 올바르지 않습니다.";
 });
 
 document.getElementById("logoutButton").addEventListener("click", () => {
   sessionStorage.removeItem(LOGIN_STORAGE_KEY);
-  selectedId = null;
   cachedData = [];
   filteredData = [];
   document.getElementById("adminPassword").value = "";
@@ -925,7 +946,11 @@ document.getElementById("logoutButton").addEventListener("click", () => {
 });
 
 document.getElementById("refreshButton").addEventListener("click", loadData);
+document.getElementById("downloadXlsxButton").addEventListener("click", downloadXlsx);
 document.getElementById("searchInput").addEventListener("input", applyFilters);
+document.getElementById("companyFilter").addEventListener("input", applyFilters);
+document.getElementById("positionFilter").addEventListener("input", applyFilters);
+document.getElementById("deptFilter").addEventListener("input", applyFilters);
 document.getElementById("scoreFilter").addEventListener("change", applyFilters);
 
 document.getElementById("tableBody").addEventListener("click", async (event) => {
@@ -933,10 +958,10 @@ document.getElementById("tableBody").addEventListener("click", async (event) => 
   if (!button) return;
 
   const { action, id } = button.dataset;
+  const item = cachedData.find(entry => entry.id === id);
 
   if (action === "view") {
-    selectedId = id;
-    renderTable(filteredData);
+    if (item) openDetailWindow(item);
     return;
   }
 

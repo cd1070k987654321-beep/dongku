@@ -110,7 +110,7 @@ let isSubmitting = false;
 function startSurvey() {
   const email = document.getElementById("email").value.trim();
   if (!email) {
-    alert("이메일은 필수입니다");
+    alert("이메일은 필수 입력 항목입니다.");
     return;
   }
 
@@ -158,7 +158,7 @@ function render() {
     <div class="question">
       <div class="q-head">
         <div class="q-num">${i + 1}</div>
-        <div>${q}</div>
+        <div class="q-text">${q}</div>
       </div>
       <div class="scale">${scale}</div>
     </div>
@@ -182,8 +182,20 @@ function updateProgress() {
   const total = questions.length;
   const percent = (done / total) * 100;
 
-  document.getElementById("bar").style.width = percent + "%";
-  document.getElementById("progressText").innerText = `${done} / ${total} 문항 완료`;
+  const bar = document.getElementById("bar");
+  const progressText = document.getElementById("progressText");
+  const percentNode = document.getElementById("progressPercent");
+  const desktopBar = document.getElementById("barDesktop");
+  const desktopText = document.getElementById("progressTextDesktop");
+  const desktopPercent = document.getElementById("progressPercentDesktop");
+
+  if (bar) bar.style.width = percent + "%";
+  if (progressText) progressText.innerText = `${done} / ${total} 문항 완료`;
+  if (percentNode) percentNode.innerText = `${Math.round(percent)}%`;
+
+  if (desktopBar) desktopBar.style.width = percent + "%";
+  if (desktopText) desktopText.innerText = `${done} / ${total} 문항 완료`;
+  if (desktopPercent) desktopPercent.innerText = `${Math.round(percent)}%`;
 }
 
 function calculateResults() {
@@ -222,11 +234,12 @@ function getLevel(avg) {
 function showResult() {
   const email = document.getElementById("email").value;
   const name = document.getElementById("name").value;
-  const dept = document.getElementById("dept").value;
+  const company = document.getElementById("company").value;
   const position = document.getElementById("position").value;
+  const dept = document.getElementById("dept").value;
 
   if (Object.keys(answers).length < questions.length) {
-    alert("모든 문항에 응답해주세요");
+    alert("모든 문항에 응답해주세요.");
     return;
   }
 
@@ -243,14 +256,18 @@ function showResult() {
 
         <div class="user-info-box">
           <div class="user-name">
-            ${name || "이름 없음"}
+            ${name || "이름 미입력"}
             <span style="font-weight:400;color:#64748b;">
               (${position || "-"})
             </span>
           </div>
 
           <div class="user-sub">
-            ${dept || "부서 없음"}
+            ${company || "회사명 미입력"}
+          </div>
+
+          <div class="user-sub">
+            ${dept || "부서 미입력"}
           </div>
 
           <div class="user-meta">
@@ -301,8 +318,9 @@ async function submitResult() {
 
   const email = document.getElementById("email").value.trim();
   const name = document.getElementById("name").value.trim();
-  const dept = document.getElementById("dept").value.trim();
+  const company = document.getElementById("company").value.trim();
   const position = document.getElementById("position").value.trim();
+  const dept = document.getElementById("dept").value.trim();
 
   const results = calculateResults();
   const averageScore = calculateAverageScore(results);
@@ -311,8 +329,9 @@ async function submitResult() {
   const payload = {
     email,
     name,
-    dept,
+    company,
     position,
+    dept,
     answers: { ...answers },
     results,
     averageScore,
@@ -331,7 +350,7 @@ async function submitResult() {
 
     await addDoc(collection(db, "surveyResponses"), payload);
 
-    alert("제출이 완료되었습니다!");
+    alert("제출이 완료되었습니다.");
 
     if (submitButton) {
       submitButton.innerText = "제출 완료";
@@ -348,6 +367,17 @@ async function submitResult() {
     isSubmitting = false;
   }
 }
+
+function syncViewportMode() {
+  if (window.innerWidth > 1024) {
+    document.body.classList.add("has-desktop-progress");
+  } else {
+    document.body.classList.remove("has-desktop-progress");
+  }
+}
+
+window.addEventListener("resize", syncViewportMode);
+syncViewportMode();
 
 window.startSurvey = startSurvey;
 window.save = save;

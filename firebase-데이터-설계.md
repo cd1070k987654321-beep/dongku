@@ -33,8 +33,9 @@
 ### 1. 사용자 기본 정보
 - 이메일
 - 이름
-- 부서
+- 회사명
 - 직급
+- 부서
 
 ### 2. 원본 응답
 - 24개 문항 각각의 1~5점 응답값
@@ -69,8 +70,9 @@ surveyResponses/
 {
   "email": "user@example.com",
   "name": "홍길동",
-  "dept": "개발팀",
+  "company": "KCG",
   "position": "대리",
+  "dept": "개발팀",
   "answers": {
     "0": 4,
     "1": 5,
@@ -144,8 +146,9 @@ surveyResponses/
 
 - `email`: 사용자 이메일, 필수
 - `name`: 사용자 이름
-- `dept`: 부서
+- `company`: 회사명
 - `position`: 직급
+- `dept`: 부서
 
 ### 응답 필드
 
@@ -197,8 +200,9 @@ surveyResponses/
 필요 데이터:
 - 이름
 - 이메일
-- 부서
+- 회사명
 - 직급
+- 부서
 - 전체 평균 점수
 - 제출 시각
 
