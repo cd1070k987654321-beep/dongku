@@ -250,6 +250,24 @@
     color: var(--muted);
   }
 
+  .action-stat-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .action-stat-button {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0f172a, #1d4ed8);
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: 0 10px 24px rgba(29, 78, 216, 0.18);
+  }
+
   .toolbar {
     padding: 18px 24px 20px;
     display: grid;
@@ -441,10 +459,12 @@
           <div class="stat-value" id="highestScore">-</div>
           <div class="stat-foot">현재 조회 결과 최고 응답</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">최근 제출</div>
-          <div class="stat-value" id="latestDate" style="font-size:18px; letter-spacing: -0.02em;">-</div>
-          <div class="stat-foot">현재 조회 결과 기준</div>
+        <div class="stat-card action-stat-card">
+          <div>
+            <div class="stat-label">조회 결과 상세페이지</div>
+            <div class="stat-foot" id="filteredSummaryText">현재 조회 결과 기준으로 리포트를 생성합니다.</div>
+          </div>
+          <button class="action-stat-button" id="openFilteredReportButton">상세보기</button>
         </div>
       </div>
 
@@ -573,6 +593,22 @@ function formatDate(value) {
   return String(value);
 }
 
+function toDateObject(value) {
+  if (!value) return null;
+  if (value.seconds) return new Date(value.seconds * 1000);
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatDateKey(value) {
+  const date = toDateObject(value);
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function escapeHtml(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -608,17 +644,16 @@ function renderStats(data) {
   if (!data.length) {
     document.getElementById("averageScore").innerText = "-";
     document.getElementById("highestScore").innerText = "-";
-    document.getElementById("latestDate").innerText = "-";
+    document.getElementById("filteredSummaryText").innerText = "현재 조회 결과가 없어 상세 리포트를 생성할 수 없습니다.";
     return;
   }
 
   const avg = data.reduce((sum, item) => sum + (item.averageScore || 0), 0) / data.length;
   const highest = Math.max(...data.map(item => item.averageScore || 0));
-  const latest = data[0]?.createdAt;
 
   document.getElementById("averageScore").innerText = avg.toFixed(2);
   document.getElementById("highestScore").innerText = highest.toFixed(2);
-  document.getElementById("latestDate").innerText = formatDate(latest);
+  document.getElementById("filteredSummaryText").innerText = `현재 ${data.length}건 조회 결과 기준 리포트를 생성합니다.`;
 }
 
 function buildExportRows(data) {
@@ -666,6 +701,53 @@ function downloadXlsx() {
   XLSX.writeFile(workbook, fileName);
 }
 
+function buildAggregatedItem(items) {
+  if (!items.length) return null;
+
+  const averageScore = items.reduce((sum, entry) => sum + Number(entry.averageScore || 0), 0) / items.length;
+  const results = CATEGORY_NAMES.map((category, categoryIndex) => {
+    const categoryValues = items
+      .map(entry => Number((entry.results || []).find(result => result.category === category)?.score || 0))
+      .filter(value => value > 0);
+    const score = categoryValues.length
+      ? Number((categoryValues.reduce((sum, value) => sum + value, 0) / categoryValues.length).toFixed(2))
+      : 0;
+
+    const baseIndex = categoryIndex * 3;
+    const detailAnswers = [0, 1, 2].map(offset => {
+      const values = items
+        .map(entry => Number(entry.answers?.[baseIndex + offset] ?? 0))
+        .filter(value => value > 0);
+      return values.length
+        ? Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2))
+        : 0;
+    });
+
+    return { category, score, detailAnswers };
+  });
+
+  const answers = {};
+  results.forEach((result, categoryIndex) => {
+    const baseIndex = categoryIndex * 3;
+    result.detailAnswers.forEach((value, offset) => {
+      answers[baseIndex + offset] = value;
+    });
+  });
+
+  return {
+    id: "filtered-report",
+    name: `조회 결과 ${items.length}건`,
+    email: "현재 필터링된 응답 집계 결과",
+    company: "현재 조회 결과 전체",
+    position: "집계 리포트",
+    dept: "필터링 기준 반영",
+    createdAt: items[0]?.createdAt || null,
+    averageScore: Number(averageScore.toFixed(2)),
+    results,
+    answers
+  };
+}
+
 function openDetailWindow(item) {
   const popup = window.open("", "kcg-response-detail", "width=1180,height=1100,resizable=yes,scrollbars=yes");
 
@@ -676,8 +758,25 @@ function openDetailWindow(item) {
 
   const labels = (item.results || []).map(result => result.category);
   const scores = (item.results || []).map(result => Number(result.score || 0));
+  const allItems = cachedData;
+  const averageCategoryScores = CATEGORY_NAMES.map(category => {
+    const values = allItems
+      .map(entry => Number((entry.results || []).find(result => result.category === category)?.score || 0))
+      .filter(value => value > 0);
+    if (!values.length) return 0;
+    return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2));
+  });
+
   const categoryBlocks = CATEGORY_NAMES.map((category, categoryIndex) => {
     const baseIndex = categoryIndex * 3;
+    const averageData = [0, 1, 2].map(offset => {
+      const values = allItems
+        .map(entry => Number(entry.answers?.[baseIndex + offset] ?? 0))
+        .filter(value => value > 0);
+      if (!values.length) return 0;
+      return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2));
+    });
+
     return {
       category,
       canvasId: `categoryRadar${categoryIndex}`,
@@ -687,6 +786,7 @@ function openDetailWindow(item) {
         Number(item.answers?.[baseIndex + 1] ?? 0),
         Number(item.answers?.[baseIndex + 2] ?? 0)
       ],
+      averageData,
       questions: [
         QUESTION_TEXTS[baseIndex],
         QUESTION_TEXTS[baseIndex + 1],
@@ -1105,7 +1205,7 @@ function openDetailWindow(item) {
 
         <section class="pdf-page pdf-page-break">
           <div class="card">
-            <div class="section-title">카테고리별 3문항 레이더 차트 (1/2)</div>
+            <div class="section-title">카테고리별 3문항 레이더 차트 </div>
             <div class="mini-grid">
               ${categoryBlocks.slice(0, 6).map(block => `
                 <div class="mini-card">
@@ -1126,7 +1226,7 @@ function openDetailWindow(item) {
 
         <section class="pdf-page pdf-page-break">
           <div class="card">
-            <div class="section-title">카테고리별 3문항 레이더 차트 (2/2)</div>
+            <div class="section-title">카테고리별 3문항 레이더 차트 </div>
             <div class="mini-grid">
               ${categoryBlocks.slice(6).map(block => `
                 <div class="mini-card">
@@ -1151,20 +1251,30 @@ function openDetailWindow(item) {
       </div>
 
       <script>
-        const createRadar = (canvasId, labels, data, label, color) => {
+        const createRadar = (canvasId, labels, personalData, averageData, personalLabel, averageLabel, color) => {
           const ctx = document.getElementById(canvasId);
+          if (!ctx || typeof Chart === 'undefined') return;
           new Chart(ctx, {
             type: 'radar',
             data: {
               labels,
               datasets: [{
-                label,
-                data,
+                label: personalLabel,
+                data: personalData,
                 borderColor: color,
                 backgroundColor: color.replace('1)', '0.16)'),
                 pointBackgroundColor: color,
                 pointBorderColor: '#fff',
                 borderWidth: 2
+              }, {
+                label: averageLabel,
+                data: averageData,
+                borderColor: 'rgba(15, 23, 42, 0.9)',
+                backgroundColor: 'rgba(15, 23, 42, 0.05)',
+                pointBackgroundColor: 'rgba(15, 23, 42, 0.9)',
+                pointBorderColor: '#fff',
+                borderWidth: 2,
+                borderDash: [6, 4]
               }]
             },
             options: {
@@ -1172,7 +1282,16 @@ function openDetailWindow(item) {
               maintainAspectRatio: false,
               plugins: {
                 legend: {
-                  display: false
+                  display: true,
+                  position: 'top',
+                  labels: {
+                    boxWidth: 14,
+                    color: '#334155',
+                    font: {
+                      size: 11,
+                      weight: '700'
+                    }
+                  }
                 }
               },
               scales: {
@@ -1205,11 +1324,13 @@ function openDetailWindow(item) {
           'resultRadarChart',
           ${JSON.stringify(labels)},
           ${JSON.stringify(scores)},
-          '개인 결과',
+          ${JSON.stringify(averageCategoryScores)},
+          '개인',
+          '전체평균',
           'rgba(225, 29, 72, 1)'
         );
 
-        ${categoryBlocks.map((block, idx) => `createRadar('${block.canvasId}', ${JSON.stringify(block.labels)}, ${JSON.stringify(block.data)}, '${block.category}', 'rgba(${40 + idx * 18}, ${99 + (idx * 9 % 100)}, ${235 - (idx * 11 % 120)}, 1)');`).join('\n')}
+        ${categoryBlocks.map((block, idx) => `createRadar('${block.canvasId}', ${JSON.stringify(block.labels)}, ${JSON.stringify(block.data)}, ${JSON.stringify(block.averageData)}, '개인', '전체평균', 'rgba(${40 + idx * 18}, ${99 + (idx * 9 % 100)}, ${235 - (idx * 11 % 120)}, 1)');`).join('\n')}
 
         document.getElementById('printPdfButton')?.addEventListener('click', () => {
           window.print();
@@ -1372,6 +1493,20 @@ document.getElementById("logoutButton").addEventListener("click", () => {
 
 document.getElementById("refreshButton").addEventListener("click", loadData);
 document.getElementById("downloadXlsxButton").addEventListener("click", downloadXlsx);
+document.getElementById("openFilteredReportButton").addEventListener("click", () => {
+  if (!filteredData.length) {
+    alert("현재 조회된 데이터가 없어 상세 리포트를 생성할 수 없습니다.");
+    return;
+  }
+
+  const aggregatedItem = buildAggregatedItem(filteredData);
+  if (!aggregatedItem) {
+    alert("집계 리포트 생성에 실패했습니다.");
+    return;
+  }
+
+  openDetailWindow(aggregatedItem);
+});
 document.getElementById("searchInput").addEventListener("input", applyFilters);
 document.getElementById("companyFilter").addEventListener("input", applyFilters);
 document.getElementById("positionFilter").addEventListener("input", applyFilters);
