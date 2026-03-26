@@ -519,7 +519,33 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const LOGIN_STORAGE_KEY = "kcgAdminLoggedIn";
-const CATEGORY_KEYS = [
+const QUESTION_TEXTS = [
+  "나는 지금 느끼는 감정을 비교적 정확한 단어로 표현할 수 있다.",
+  "기분이 좋지 않을 때, 그것이 불안·짜증·실망·혼란 중 무엇에 가까운지 구분할 수 있다.",
+  "중요한 대화나 결정 전에 내 감정 상태를 점검하는 편이다.",
+  "나는 스트레스를 받을 때 반복적으로 나타나는 나의 반응 패턴을 알고 있다.",
+  "특정 사람이나 상황에서 내가 예민해지는 이유를 어느 정도 설명할 수 있다.",
+  "후회했던 행동이 어떤 상황에서 반복되는지 인식하고 있다.",
+  "말하거나 행동하기 전에 내 선택의 결과를 먼저 생각하는 편이다.",
+  "감정이 강하게 올라와도 단기 영향과 장기 영향을 구분해 보려고 한다.",
+  "내 결정이 나뿐 아니라 팀과 관계에 미칠 영향까지 고려한다.",
+  "감정이 격해져도 즉각 반응하지 않고 한 템포 멈출 수 있다.",
+  "긴장이나 압박을 느낄 때 그것을 준비와 집중의 에너지로 전환하려고 한다.",
+  "감정 때문에 판단이 흐려질 때 스스로 균형을 회복하는 방법이 있다.",
+  "외부 보상이 크지 않아도 일이 의미 있다고 느끼면 몰입할 수 있다.",
+  "나는 목표를 추진할 때 스스로 납득할 만한 이유를 찾는 편이다.",
+  "누가 시켜서보다 내가 중요하다고 느끼는 일에 더 지속적으로 힘을 낸다.",
+  "문제가 생기면 불가능한 이유보다 가능한 대안을 먼저 찾으려 한다.",
+  "실패나 실수를 겪어도 배울 점을 찾고 다시 시도하려는 편이다.",
+  "불확실한 상황에서도 내가 통제할 수 있는 부분에 집중한다.",
+  "상대의 말뿐 아니라 그 뒤에 있는 감정까지 이해하려고 노력한다.",
+  "누군가 부정적으로 반응할 때도 그 사람 입장에서 이유를 생각해본다.",
+  "피드백이나 조언을 할 때 상대의 감정 상태를 고려하는 편이다.",
+  "나는 일상의 업무를 개인적 가치나 더 큰 목적과 연결해 생각하려 한다.",
+  "중요한 선택에서는 ‘무엇이 유리한가’뿐 아니라 ‘무엇이 의미 있는가’도 본다.",
+  "단기 성과보다 장기적으로 옳고 가치 있는 방향을 중시하는 편이다."
+];
+const CATEGORY_NAMES = [
   "감정식별력",
   "패턴인식",
   "결과예측",
@@ -641,29 +667,59 @@ function downloadXlsx() {
 }
 
 function openDetailWindow(item) {
-  const popup = window.open("", "kcg-response-detail", "width=860,height=900,resizable=yes,scrollbars=yes");
+  const popup = window.open("", "kcg-response-detail", "width=1180,height=1100,resizable=yes,scrollbars=yes");
 
   if (!popup) {
     alert("팝업이 차단되었습니다. 브라우저에서 팝업을 허용해주세요.");
     return;
   }
 
-  const resultsHtml = (item.results || []).map(result => {
-    const score = Number(result.score || 0);
-    const width = Math.max(0, Math.min(100, (score / 5) * 100));
+  const labels = (item.results || []).map(result => result.category);
+  const scores = (item.results || []).map(result => Number(result.score || 0));
+  const categoryBlocks = CATEGORY_NAMES.map((category, categoryIndex) => {
+    const baseIndex = categoryIndex * 3;
+    const answer1 = Number(item.answers?.[baseIndex] ?? 0);
+    const answer2 = Number(item.answers?.[baseIndex + 1] ?? 0);
+    const answer3 = Number(item.answers?.[baseIndex + 2] ?? 0);
 
+    return {
+      category,
+      canvasId: `categoryRadar${categoryIndex}`,
+      labels: ["문항 1", "문항 2", "문항 3"],
+      data: [answer1, answer2, answer3],
+      questions: [
+        QUESTION_TEXTS[baseIndex],
+        QUESTION_TEXTS[baseIndex + 1],
+        QUESTION_TEXTS[baseIndex + 2]
+      ]
+    };
+  });
+
+  const summaryCards = (item.results || []).map(result => {
+    const score = Number(result.score || 0);
     return `
       <div class="result-item">
         <div class="result-row">
           <div class="result-name">${escapeHtml(result.category)}</div>
           <div class="result-score">${score.toFixed(2)}점</div>
         </div>
-        <div class="bar-track">
-          <div class="bar-fill" style="width:${width}%"></div>
-        </div>
       </div>
     `;
   }).join("");
+
+  const categoryChartsHtml = categoryBlocks.map(block => `
+    <div class="mini-card">
+      <div class="mini-title">${escapeHtml(block.category)}</div>
+      <div class="mini-chart-wrap">
+        <canvas id="${block.canvasId}"></canvas>
+      </div>
+      <div class="mini-question-list">
+        <div>1. ${escapeHtml(block.questions[0] || "")}</div>
+        <div>2. ${escapeHtml(block.questions[1] || "")}</div>
+        <div>3. ${escapeHtml(block.questions[2] || "")}</div>
+      </div>
+    </div>
+  `).join("");
 
   popup.document.write(`
     <!DOCTYPE html>
@@ -672,6 +728,7 @@ function openDetailWindow(item) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>응답 상세보기</title>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
       <style>
         * { box-sizing: border-box; }
         body {
@@ -682,7 +739,7 @@ function openDetailWindow(item) {
           color: #0f172a;
         }
         .wrap {
-          max-width: 900px;
+          max-width: 1180px;
           margin: 0 auto;
         }
         .card {
@@ -730,9 +787,14 @@ function openDetailWindow(item) {
           font-size: 18px;
           font-weight: 800;
         }
+        .chart-wrap {
+          height: 520px;
+        }
         .result-list {
           display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 12px;
+          margin-top: 18px;
         }
         .result-item {
           border: 1px solid #e2e8f0;
@@ -755,18 +817,30 @@ function openDetailWindow(item) {
           font-weight: 800;
           color: #2563eb;
         }
-        .bar-track {
-          margin-top: 10px;
-          width: 100%;
-          height: 8px;
-          border-radius: 999px;
-          background: #e2e8f0;
-          overflow: hidden;
+        .mini-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
         }
-        .bar-fill {
-          height: 100%;
-          border-radius: 999px;
-          background: linear-gradient(90deg, #60a5fa, #2563eb);
+        .mini-card {
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+          padding: 16px;
+          background: #fff;
+        }
+        .mini-title {
+          font-size: 16px;
+          font-weight: 800;
+          margin-bottom: 10px;
+        }
+        .mini-chart-wrap {
+          height: 280px;
+        }
+        .mini-question-list {
+          margin-top: 12px;
+          font-size: 12px;
+          line-height: 1.7;
+          color: #475569;
         }
       </style>
     </head>
@@ -786,10 +860,82 @@ function openDetailWindow(item) {
         </div>
 
         <div class="card">
-          <div class="section-title">카테고리별 결과</div>
-          <div class="result-list">${resultsHtml || '<div>결과 데이터 없음</div>'}</div>
+          <div class="section-title">카테고리별 결과 그래프</div>
+          <div class="chart-wrap">
+            <canvas id="resultRadarChart"></canvas>
+          </div>
+          <div class="result-list">${summaryCards || '<div>결과 데이터 없음</div>'}</div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">카테고리별 3문항 레이더 차트</div>
+          <div class="mini-grid">
+            ${categoryChartsHtml}
+          </div>
         </div>
       </div>
+
+      <script>
+        const createRadar = (canvasId, labels, data, label, color) => {
+          const ctx = document.getElementById(canvasId);
+          new Chart(ctx, {
+            type: 'radar',
+            data: {
+              labels,
+              datasets: [{
+                label,
+                data,
+                borderColor: color,
+                backgroundColor: color.replace('1)', '0.16)'),
+                pointBackgroundColor: color,
+                pointBorderColor: '#fff',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                }
+              },
+              scales: {
+                r: {
+                  min: 0,
+                  max: 5,
+                  ticks: {
+                    stepSize: 1,
+                    backdropColor: 'transparent'
+                  },
+                  pointLabels: {
+                    font: {
+                      size: 12
+                    },
+                    color: '#334155'
+                  },
+                  grid: {
+                    color: '#cbd5e1'
+                  },
+                  angleLines: {
+                    color: '#cbd5e1'
+                  }
+                }
+              }
+            }
+          });
+        };
+
+        createRadar(
+          'resultRadarChart',
+          ${JSON.stringify(labels)},
+          ${JSON.stringify(scores)},
+          '개인 결과',
+          'rgba(225, 29, 72, 1)'
+        );
+
+        ${categoryBlocks.map((block, idx) => `createRadar('${block.canvasId}', ${JSON.stringify(block.labels)}, ${JSON.stringify(block.data)}, '${block.category}', 'rgba(${40 + idx * 20}, ${99 + (idx * 11 % 100)}, ${235 - (idx * 10 % 120)}, 1)');`).join('\n')}
+      <\/script>
     </body>
     </html>
   `);
